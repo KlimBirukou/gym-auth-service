@@ -1,0 +1,56 @@
+name: gym
+
+services:
+  gym-auth-database:
+    container_name: gym-auth-database
+    build:
+      context: .
+      dockerfile: docker/database/Dockerfile
+    environment:
+      - POSTGRES_DB=gym_auth_database
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5431:5432"
+    volumes:
+      - gym_auth_database_volumes:/var/lib/postgresql
+    networks:
+      - gym-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d database" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  gym-auth-server:
+    container_name: gym-auth-server
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - JWT_SECRET=HodGQAGZgQtgrkLj4JaCw0mfZQMRoY8pJfKLEEHDCvg=
+      - SPRING_CONFIG_IMPORT=configserver:http://gym-config-server:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+      - SPRING_PROFILES_ACTIVE=default
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gym-discovery-server:8761/eureka/
+    networks:
+      - gym-network
+    depends_on:
+      gym-auth-database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+networks:
+  gym-network:
+    external: true
+
+volumes:
+  gym_auth_database_volumes:
