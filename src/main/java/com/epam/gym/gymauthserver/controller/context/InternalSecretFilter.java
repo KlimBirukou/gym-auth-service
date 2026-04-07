@@ -8,10 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j
@@ -27,18 +30,18 @@ public class InternalSecretFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (!request.getRequestURI().startsWith("/internal/")) {
-            filterChain.doFilter(request, response);
-            return;
+        if (request.getRequestURI().startsWith("/internal/")) {
+            String requestSecret = request.getHeader(INTERNAL_SECRET_HEADER);
+
+            if (internalProperties.secret().equals(requestSecret)) {
+                var auth = new UsernamePasswordAuthenticationToken(
+                    "INTERNAL_SERVICE", null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                log.warn("Rejected internal request without valid secret. URI={}", request.getRequestURI());
+            }
         }
-        var isAuthorized = Optional.ofNullable(request.getHeader(INTERNAL_SECRET_HEADER))
-            .filter(header -> internalProperties.secret().equals(header))
-            .isPresent();
-        if (isAuthorized) {
-            filterChain.doFilter(request, response);
-        } else {
-            log.warn("Rejected internal request without valid secret. URI={}", request.getRequestURI());
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-        }
+
+        filterChain.doFilter(request, response);
     }
 }

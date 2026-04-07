@@ -10,6 +10,7 @@ public record BruteForceStatusResponse(
     boolean blocked,
     long minutesLeft
 ) {
+
     public static BruteForceStatusResponse notBlocked() {
         return new BruteForceStatusResponse(false, 0);
     }
