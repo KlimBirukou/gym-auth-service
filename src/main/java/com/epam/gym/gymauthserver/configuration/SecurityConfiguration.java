@@ -1,5 +1,6 @@
 package com.epam.gym.gymauthserver.configuration;
 
+import com.epam.gym.gymauthserver.configuration.properties.SecurityProperties;
 import com.epam.gym.gymauthserver.controller.context.InternalSecretFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,14 +15,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfiguration {
 
     private final InternalSecretFilter internalSecretFilter;
-
-    private static final String[] PUBLIC_ENDPOINTS = {
-        "/actuator/health",
-        "/actuator/info"
-    };
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -31,8 +28,8 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers("/internal/**").authenticated()
+                .requestMatchers(securityProperties.publicEndpoints().toArray(String[]::new)).permitAll()
+                .requestMatchers(securityProperties.internalPattern()).authenticated()
                 .anyRequest().denyAll())
             .addFilterBefore(internalSecretFilter, UsernamePasswordAuthenticationFilter.class)
             .build();

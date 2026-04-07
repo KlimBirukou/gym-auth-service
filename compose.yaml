@@ -17,7 +17,7 @@ services:
     networks:
       - gym-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d database" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d gym_auth_database" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,11 +31,15 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - JWT_SECRET=HodGQAGZgQtgrkLj4JaCw0mfZQMRoY8pJfKLEEHDCvg=
       - SPRING_CONFIG_IMPORT=configserver:http://gym-config-server:8888
       - SPRING_CLOUD_CONFIG_FAIL_FAST=true
       - SPRING_PROFILES_ACTIVE=default
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://gym-discovery-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://gym-auth-database:5432/gym_auth_database?currentSchema=gym_auth_schema
+      - SPRING_DATASOURCE_USERNAME=gym_auth_user
+      - SPRING_DATASOURCE_PASSWORD=LiGzbc7J0ZJza6pp
+      - APPLICATION_AUTH_SECRET=HodGQAGZgQtgrkLj4JaCw0mfZQMRoY8pJfKLEEHDCvg=
+      - APPLICATION_INTERNAL_SECRET=AUTH_SECRET_SUPER_PUPER_SECRET_ULTRA_MAX_FOREVER_SECRET
     networks:
       - gym-network
     depends_on:

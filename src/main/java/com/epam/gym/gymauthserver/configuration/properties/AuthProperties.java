@@ -9,7 +9,8 @@ public record AuthProperties(
     int maxLoginAttempts,
     Duration blockDuration,
     long jwtExpiration,
-    String secret
+    String secret,
+    String prefix
 ) {
 
 }

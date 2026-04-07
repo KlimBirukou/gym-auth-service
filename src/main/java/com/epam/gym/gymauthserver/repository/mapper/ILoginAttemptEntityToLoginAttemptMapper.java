@@ -1,7 +1,8 @@
-package com.epam.gym.gymauthserver.repository;
+package com.epam.gym.gymauthserver.repository.mapper;
 
 import com.epam.gym.gymauthserver.configuration.IMapStructConfiguration;
 import com.epam.gym.gymauthserver.domain.LoginAttempt;
+import com.epam.gym.gymauthserver.repository.entity.LoginAttemptEntity;
 import lombok.NonNull;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

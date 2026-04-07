@@ -1,4 +1,4 @@
-package com.epam.gym.gymauthserver.repository;
+package com.epam.gym.gymauthserver.repository.domain;
 
 import com.epam.gym.gymauthserver.domain.LoginAttempt;
 import lombok.NonNull;

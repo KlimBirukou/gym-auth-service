@@ -1,6 +1,8 @@
-package com.epam.gym.gymauthserver.repository;
+package com.epam.gym.gymauthserver.repository.domain;
 
 import com.epam.gym.gymauthserver.domain.LoginAttempt;
+import com.epam.gym.gymauthserver.repository.entity.ILoginAttemptEntityRepository;
+import com.epam.gym.gymauthserver.repository.entity.LoginAttemptEntity;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;

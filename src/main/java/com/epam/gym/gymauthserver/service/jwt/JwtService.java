@@ -4,7 +4,7 @@ import com.epam.gym.gymauthserver.configuration.properties.AuthProperties;
 import com.epam.gym.gymauthserver.controller.rest.dto.request.GenerateTokenRequest;
 import com.epam.gym.gymauthserver.controller.rest.dto.response.LoginResponse;
 import com.epam.gym.gymauthserver.controller.rest.dto.response.ValidateResponse;
-import com.epam.gym.gymauthserver.repository.ILoginAttemptRepository;
+import com.epam.gym.gymauthserver.repository.domain.ILoginAttemptRepository;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -22,8 +22,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtService implements IJwtService {
 
-    private static final String BEARER_PREFIX = "Bearer";
-
     private final ILoginAttemptRepository loginAttemptRepository;
     private final AuthProperties authProperties;
 
@@ -31,7 +29,7 @@ public class JwtService implements IJwtService {
     public LoginResponse generateToken(@NonNull GenerateTokenRequest request) {
         loginAttemptRepository.deleteByUserUid(request.userUid());
         return LoginResponse.builder()
-            .tokenType(BEARER_PREFIX)
+            .tokenType(authProperties.prefix())
             .accessToken(buildToken(request.username()))
             .expiresIn(authProperties.jwtExpiration())
             .build();
@@ -60,8 +58,8 @@ public class JwtService implements IJwtService {
     private Optional<String> extractToken(String authHeader) {
         return Optional.ofNullable(authHeader)
             .filter(StringUtils::hasText)
-            .filter(h -> h.startsWith(BEARER_PREFIX))
-            .map(h -> h.substring(BEARER_PREFIX.length()).trim());
+            .filter(h -> h.startsWith(authProperties.prefix()))
+            .map(h -> h.substring(authProperties.prefix().length()).trim());
     }
 
     private boolean isTokenValid(String token) {

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JwtFacade implements IJwtFacade{
+public class JwtFacade implements IJwtFacade {
 
     private final IJwtService jwtService;
 

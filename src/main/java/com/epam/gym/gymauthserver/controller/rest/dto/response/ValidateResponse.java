@@ -6,10 +6,11 @@ import lombok.Builder;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record ValidateResponse (
+public record ValidateResponse(
     boolean valid,
     String username
 ) {
+
     public static ValidateResponse valid(String username) {
         return new ValidateResponse(true, username);
     }

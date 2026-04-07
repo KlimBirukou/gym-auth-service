@@ -1,4 +1,4 @@
-package com.epam.gym.gymauthserver.repository;
+package com.epam.gym.gymauthserver.repository.entity;
 
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -25,15 +25,25 @@ public class LoginAttempt {
     private int failedAttempts;
     private LocalDateTime lastFailedAt;
 
-    public boolean isBlocked(int maxAttempts, @NonNull Duration blockDuration) {
-        return checkStatus(maxAttempts, blockDuration, time -> time.isAfter(LocalDateTime.now()));
+    public boolean isBlocked(int maxAttempts, @NonNull Duration blockDuration, @NonNull Clock clock) {
+        return checkStatus(
+            maxAttempts,
+            blockDuration,
+            clock,
+            unblockTime -> unblockTime.isAfter(LocalDateTime.now(clock)));
     }
 
-    public boolean isExpired(int maxAttempts, @NonNull Duration blockDuration) {
-        return checkStatus(maxAttempts, blockDuration, time -> !time.isAfter(LocalDateTime.now()));
+    public boolean isExpired(int maxAttempts, @NonNull Duration blockDuration, @NonNull Clock clock) {
+        return checkStatus(maxAttempts,
+            blockDuration,
+            clock,
+            unblockTime -> !unblockTime.isAfter(LocalDateTime.now(clock)));
     }
 
-    private boolean checkStatus(int maxAttempts, Duration blockDuration, Predicate<LocalDateTime> timeCondition) {
+    private boolean checkStatus(int maxAttempts,
+                                Duration blockDuration,
+                                Clock clock,
+                                Predicate<LocalDateTime> timeCondition) {
         return Optional.ofNullable(lastFailedAt)
             .filter(last -> failedAttempts >= maxAttempts)
             .map(last -> last.plus(blockDuration))
@@ -41,17 +51,17 @@ public class LoginAttempt {
             .orElse(false);
     }
 
-    public long minutesUntilUnblock(@NonNull Duration blockDuration) {
+    public Duration minutesUntilUnblock(@NonNull Duration blockDuration, @NonNull Clock clock) {
         return Optional.ofNullable(lastFailedAt)
             .map(last -> last.plus(blockDuration))
-            .map(unblockTime -> ChronoUnit.MINUTES.between(LocalDateTime.now(), unblockTime) + 1)
-            .filter(minutes -> minutes > 0)
-            .orElse(0L);
+            .map(unblockTime -> Duration.between(LocalDateTime.now(clock), unblockTime))
+            .filter(remaining -> !remaining.isNegative())
+            .orElse(Duration.ZERO);
     }
 
-    public void recordFailure() {
+    public void recordFailure(@NonNull Clock clock) {
         this.failedAttempts++;
-        this.lastFailedAt = LocalDateTime.now();
+        this.lastFailedAt = LocalDateTime.now(clock);
     }
 
     public void reset() {
