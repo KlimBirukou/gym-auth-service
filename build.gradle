@@ -14,17 +14,21 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 ext {
+    set('springCloudVersion', "2025.1.1")
     set('jwtVersion', "0.12.7")
     set('lombokVersion', "1.18.44")
-    set('lombokMapstructBindingVersion', "0.2.0")
     set('mapstructVersion', "1.6.3")
     set('mapstructSpringExtensionsVersion', "2.0.0")
-    set('springCloudVersion', "2025.1.1")
+    set('lombokMapstructBindingVersion', "0.2.0")
+}
+
+bootRun {
+    systemProperty 'spring.profiles.active', 'local'
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -36,6 +40,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
 
     implementation "io.jsonwebtoken:jjwt-api:${jwtVersion}"
+    implementation 'org.aspectj:aspectjweaver'
     implementation "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -45,6 +50,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.retry:spring-retry'
 
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-orgjson:${jwtVersion}"

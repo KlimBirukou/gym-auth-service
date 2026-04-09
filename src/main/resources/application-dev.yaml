@@ -1,0 +1,31 @@
+spring:
+  jackson:
+    property-naming-strategy: LOWER_CAMEL_CASE
+  application:
+    name: gym-auth-server
+  config:
+    import: "configserver:http://gym-config-server:8888"
+  profiles:
+    active: default
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        max-attempts: 6
+        initial-interval: 2000
+        multiplier: 1.5
+        max-interval: 10000
+
+logging:
+  pattern:
+    console: "%clr([){faint}%clr(${spring.application.name:}){cyan}%clr( : ){faint}%clr(%X{requestUid:-}){magenta}%clr(]){faint} %clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%thread]){faint} %clr(%logger{36}){cyan} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    com.epam.gym.gymauthserver.controller.context: TRACE
+    org.apache.catalina: DEBUG
+    org.apache.tomcat.util.net: DEBUG
+
+server:
+  port: 8083

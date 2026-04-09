@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: gym-auth-server
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  output:
+    ansi:
+      enabled: always
+
+  datasource:
+    url: jdbc:postgresql://localhost:5531/gym_local_auth_database?currentSchema=gym_auth_schema
+    username: gym_auth_user
+    password: LiGzbc7J0ZJza6pp
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: gym_auth_schema
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/main-changelog.yaml
+    default-schema: gym_auth_schema
+    contexts: default
+
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+application:
+  auth:
+    secret: HodGQAGZgQtgrkLj4JaCw0mfZQMRoY8pJfKLEEHDCvg=
+    max-login-attempts: 3
+    block-duration: PT15M
+    jwt-expiration: 86400
+    prefix: "Bearer"
+  internal:
+    secret: AUTH_SECRET_SUPER_PUPER_SECRET_ULTRA_MAX_FOREVER_SECRET
+    header-name: "X-Internal-Secret"
+    principal: "INTERNAL_SERVICE"
+  request-uid:
+    header-name: "X-Request-Uid"
+    mdc-key: "requestUid"
+  security:
+    endpoints:
+      public-endpoints:
+        - "/actuator/health"
+        - "/actuator/info"
+      internal-pattern: "/internal/**"
+      internal-prefix: "/internal/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  pattern:
+    console: "%clr([){faint}%clr(${spring.application.name:}){cyan}%clr( : ){faint}%clr(%X{requestUid:-}){magenta}%clr(]){faint} %clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%thread]){faint} %clr(%logger{36}){cyan} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  level:
+    root: WARN
+    com.epam.gym: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.results: INFO
+    
+server:
+  port: 8093

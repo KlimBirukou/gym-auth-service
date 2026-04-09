@@ -1,0 +1,31 @@
+name: gym-local
+
+services:
+  gym-local-auth-database:
+    container_name: gym-local-auth-database
+    build:
+      context: .
+      dockerfile: docker/database/Dockerfile
+    environment:
+      - POSTGRES_DB=gym_local_auth_database
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5531:5432"
+    volumes:
+      - gym_local_auth_database_volumes:/var/lib/postgresql
+    networks:
+      - gym-network-local
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d gym_local_auth_database" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+networks:
+  gym-network-local:
+    external: true
+
+volumes:
+  gym_local_auth_database_volumes:
