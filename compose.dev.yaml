@@ -1,4 +1,4 @@
-name: gym
+name: gym-dev
 
 services:
   gym-auth-database:
@@ -13,9 +13,9 @@ services:
     ports:
       - "5431:5432"
     volumes:
-      - gym_auth_database_volumes:/var/lib/postgresql
+      - gym_dev_auth_database_volumes:/var/lib/postgresql
     networks:
-      - gym-network
+      - gym-dev-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d gym_auth_database" ]
       interval: 10s
@@ -31,7 +31,7 @@ services:
     ports:
       - "8083:8083"
     networks:
-      - gym-network
+      - gym-dev-network
     depends_on:
       gym-auth-database:
         condition: service_healthy
@@ -45,8 +45,8 @@ services:
       start_period: 60s
 
 networks:
-  gym-network:
+  gym-dev-network:
     external: true
 
 volumes:
-  gym_auth_database_volumes:
+  gym_dev_auth_database_volumes:

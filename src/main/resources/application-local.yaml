@@ -1,20 +1,17 @@
 spring:
   application:
     name: gym-auth-server
-
-  jackson:
-    property-naming-strategy: SNAKE_CASE
-
+  cloud:
+    config:
+      enabled: false
   output:
     ansi:
       enabled: always
-
   datasource:
-    url: jdbc:postgresql://localhost:5531/gym_local_auth_database?currentSchema=gym_auth_schema
+    url: jdbc:postgresql://localhost:5431/gym_auth_database?currentSchema=gym_auth_schema
     username: gym_auth_user
     password: LiGzbc7J0ZJza6pp
     driver-class-name: org.postgresql.Driver
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -22,18 +19,16 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         default_schema: gym_auth_schema
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/main-changelog.yaml
     default-schema: gym_auth_schema
     contexts: default
 
-  cloud:
-    config:
-      enabled: false
+server:
+  port: 8083
 
 eureka:
   client:
@@ -61,27 +56,13 @@ application:
       internal-pattern: "/internal/**"
       internal-prefix: "/internal/"
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,prometheus"
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: never
-
 logging:
-  pattern:
-    console: "%clr([){faint}%clr(${spring.application.name:}){cyan}%clr( : ){faint}%clr(%X{requestUid:-}){magenta}%clr(]){faint} %clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%thread]){faint} %clr(%logger{36}){cyan} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
   level:
     root: WARN
     com.epam.gym: DEBUG
-    org.springframework.web: INFO
+    org.springframework.web: DEBUG
     org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.results: INFO
-    
-server:
-  port: 8093
+  pattern:
+    correlation: "[${spring.application.name:},%X{requestUid:-}] "
+    console: "%clr([){faint}%clr(${spring.application.name:}){cyan}%clr( : ){faint}%clr(%X{requestUid:-}){magenta}%clr(]){faint} %clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%thread]){faint} %clr(%logger{36}){cyan} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
