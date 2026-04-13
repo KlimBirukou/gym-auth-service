@@ -9,5 +9,5 @@ public interface IJwtFacade {
 
     LoginResponse generateToken(@NonNull GenerateTokenRequest request);
 
-    ValidateResponse validate(String authHeader);
+    ValidateResponse validate(@NonNull String authHeader);
 }

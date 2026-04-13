@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +25,9 @@ public class RequestUidMdcFilter extends OncePerRequestFilter {
     private final RequestUidProperties requestUidProperties;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         var uid = Optional.ofNullable(request.getHeader(requestUidProperties.headerName()))
             .filter(StringUtils::isNotBlank)
             .orElseGet(() -> UUID.randomUUID().toString());

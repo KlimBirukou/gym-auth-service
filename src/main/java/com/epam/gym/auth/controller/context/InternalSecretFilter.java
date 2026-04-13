@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,18 +28,23 @@ public class InternalSecretFilter extends OncePerRequestFilter {
     private final SecurityProperties securityProperties;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().startsWith(securityProperties.internalPrefix())) {
-            String requestSecret = request.getHeader(internalProperties.headerName());
-            if (internalProperties.secret().equals(requestSecret)) {
-                var auth = new UsernamePasswordAuthenticationToken(
-                    internalProperties.principal(), null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            } else {
-                log.warn(LOG_MESSAGE, request.getRequestURI());
-            }
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !request
+            .getRequestURI()
+            .startsWith(securityProperties.internalPrefix());
+    }
+
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+        var requestSecret = request.getHeader(internalProperties.headerName());
+        if (internalProperties.secret().equals(requestSecret)) {
+            var auth = new UsernamePasswordAuthenticationToken(
+                internalProperties.principal(), null, Collections.emptyList());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
+            log.warn(LOG_MESSAGE, request.getRequestURI());
         }
         filterChain.doFilter(request, response);
     }

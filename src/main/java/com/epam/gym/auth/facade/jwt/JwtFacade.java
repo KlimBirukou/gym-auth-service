@@ -25,7 +25,7 @@ public class JwtFacade implements IJwtFacade {
     }
 
     @Override
-    public ValidateResponse validate(String authHeader) {
+    public ValidateResponse validate(@NonNull String authHeader) {
         log.info("Validate token. Started.");
         var response = jwtService.validate(authHeader);
         log.info("Validate token. Finished. Username={}, valid={}", response.username(), response.valid());
