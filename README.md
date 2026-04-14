@@ -1,0 +1,1 @@
+Authentication and authorization service. Responsible for issuing and validating JWT tokens. During login, applies brute-force protection by tracking failed attempts and blocking suspicious activity. Both CRM and Workload services call this service to validate tokens on incoming requests.
