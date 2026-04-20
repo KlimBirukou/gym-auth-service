@@ -4,6 +4,7 @@ import com.epam.gym.auth.controller.rest.dto.request.GenerateTokenRequest;
 import com.epam.gym.auth.controller.rest.dto.response.LoginResponse;
 import com.epam.gym.auth.controller.rest.dto.response.ValidateResponse;
 import com.epam.gym.auth.facade.jwt.IJwtFacade;
+import com.epam.gym.auth.metrics.annotation.Measured;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +22,13 @@ public class JwtController {
     private final IJwtFacade jwtFacade;
 
     @PostMapping
+    @Measured("POST_internal_v1_jwt_generate")
     public LoginResponse generateToken(@RequestBody GenerateTokenRequest request) {
         return jwtFacade.generateToken(request);
     }
 
     @GetMapping
+    @Measured("GET_internal_v1_jwt_validate")
     public ValidateResponse validateToken(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authHeader
     ) {

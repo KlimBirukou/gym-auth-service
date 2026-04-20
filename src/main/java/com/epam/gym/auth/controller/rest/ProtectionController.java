@@ -2,6 +2,7 @@ package com.epam.gym.auth.controller.rest;
 
 import com.epam.gym.auth.controller.rest.dto.response.BruteForceStatusResponse;
 import com.epam.gym.auth.facade.protection.IProtectionFacade;
+import com.epam.gym.auth.metrics.annotation.Measured;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,12 +22,14 @@ public class ProtectionController {
     private final IProtectionFacade protectionFacade;
 
     @GetMapping("/{userUid}")
+    @Measured("GET_internal_v1_protection_status")
     public BruteForceStatusResponse getStatus(@PathVariable UUID userUid) {
         return protectionFacade.getStatus(userUid);
     }
 
     @PostMapping("/{userUid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Measured("POST_internal_v1_protection_record_failure_attempt")
     public void recordFailedAttempt(@PathVariable UUID userUid) {
         protectionFacade.recordFailedAttempt(userUid);
     }
